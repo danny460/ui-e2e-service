@@ -1,0 +1,16 @@
+{
+    "env": {
+        "node": true,
+        "es6": true
+    },
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ]
+}

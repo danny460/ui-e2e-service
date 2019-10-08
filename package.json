@@ -1,0 +1,17 @@
+{
+  "name": "codeworks-automation-framework",
+  "version": "0.1.0",
+  "private": true,
+  "description": "E2E Automation Service With Web Portal",
+  "scripts": {
+    "test": "node packages/mocha-scripts/cli.js --reporter packages/mocha-actor-reporter/dist --require packages/mocha-actor-interface --ui mocha-actor  ../../ui-e2e-lib/automation/specs/ui.spec.js",
+    "deps": "cd packages && ls -d */ | xargs -I {} bash -c \"cd '{}' && pwd && yarn install\""
+  },
+  "devDependencies": {
+    "eslint": "^6.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

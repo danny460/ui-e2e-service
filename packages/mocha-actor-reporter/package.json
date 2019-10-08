@@ -1,0 +1,37 @@
+{
+	"name": "mocha-actor-reporter",
+	"version": "1.0.0",
+	"license": "MIT",
+	"engines": {
+		"node": ">=8"
+	},
+	"scripts": {
+		"clean": "rm -rf dist",
+		"prebuild": "yarn clean",
+		"build": "babel src --out-dir dist"
+	},
+	"main": "dist/index",
+	"dependencies": {
+		"eslint-plugin-react": "^7.14.3",
+		"express": "^4.17.1",
+		"flatted": "^2.0.1",
+		"ink": "^2.4.0",
+		"meow": "^5.0.0",
+		"prop-types": "^15.7.2",
+		"react": "^16.10.1",
+		"selenium-actor": "file:../selenium-actor",
+		"shortid": "^2.2.15",
+		"uuid": "^3.3.3"
+	},
+	"devDependencies": {
+		"@babel/cli": "^7.6.2",
+		"@babel/core": "^7.6.2",
+		"@babel/node": "^7.6.3",
+		"@babel/preset-env": "^7.6.2",
+		"@babel/preset-react": "^7.0.0",
+		"babel-plugin-add-module-exports": "^1.0.2",
+		"eslint": "^6.5.0",
+		"eslint-plugin-react-hooks": "^2.1.1",
+		"socket.io": "^2.3.0"
+	}
+}

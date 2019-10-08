@@ -1,0 +1,46 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "cli",
+            "args": [
+                "${workspaceFolder}/packages/mocha-scripts/cli.js",
+                "run"
+            ],
+            "console": "integratedTerminal",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "cli-server",
+            "args": [
+                "${workspaceFolder}/packages/mocha-scripts/cli.js",
+                "server",
+                "9090",
+            ],
+            "console": "integratedTerminal",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha Custom UI",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "--reporter", 
+                "${workspaceFolder}/mocha-actor-framework/mocha-actor-reporter/dist",
+                "--require", 
+                "${workspaceFolder}/mocha-actor-framework/mocha-actor-ui",
+                "--ui",
+                "mocha-actor",
+                "${workspaceFolder}/automation/specs/ui.spec.js"
+            ],
+            "console": "integratedTerminal",
+        },
+    ]
+}

@@ -1,0 +1,7 @@
+{
+    "eslint.workingDirectories": [
+        "mocha-actor-framework/reporter",
+        "mocha-actor-framework/webapp"
+    ],
+    "javascript.validate.enable": false,
+}
