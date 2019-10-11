@@ -20,9 +20,9 @@ P.S. hope you are using Mac :P
 
 2. Run command:
 ```
-yarn install && yarn deps
+yarn install
 ```
-This will install all the dependencies in the parent and subpackages.
+This will install and link dependencies for the package and all subpackages
 
 3. Download the selenium chrome / safari etc... drivers and configure them in your PATH.
 ```zsh
@@ -30,13 +30,36 @@ export PATH=path/to/your/webdrivers/folder:$PATH
 ```
 You don't have to install all, just the ones you need. You can find the downloads here https://www.seleniumhq.org/download/
 
-## Understand the Structure
+## Run Project
+**Run server**
+```
+yarn goworks:server
+```
+or
+```
+cli/bin/goworks server
+```
+This will start a local server, running on default port 8989. Access the webapp on https://localhost:8989
+
+**Run test via Cli**
+```
+yarn goworks:run --file your/test/file.js
+```
+or
+```
+cli/bin/goworks run --file your/test/file.js
+```
+
+## Project Structure
 `Mocha` is a very popular javascript test runner, and it provides some decent and extensible interfaces, we are extending mocha to provide additional reporting and scripting options for our framework.
 
-The code is orgainized into subpackages under the `packages` folder, here are the list of subpackages:
-- **mocha-actor-interface** - this is the extension on mocha to support the custom scripting style (e.g. `I.click(...)`, `I.fill(...)`)
-- **mocha-actor-reporter** - this is the custom reporter that records progress and results for each test run, the webapp interacts with the reporter to obtain updates on testing progress.
-- **selenium-actor** - this is the wrapper over selenium, the command list are defined here.
-- **webapp** - this is web portal (UI), both client and server.
-- **mocha-scripts** - this is the cli, can be use to start the UI or run tests directly
+The code is orgainized into subpackages in `cli/` and under the `packages/` folder, here are the list of subpackages:
+
+| name                       | responsibility                                                                                                               |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| @pkg/mocha-actor-interface | this is the extension on mocha to support the custom scripting style (e.g. `I.click(...)`, `I.fill(...)`)                  |
+| @pkg/mocha-actor-reporter  | this is the custom reporter that records progress and results for each test run, the webapp interacts with the reporter to |
+| @pkg/selenium-actor        | this is the wrapper over selenium, the command list are defined here.                                                      |
+| @pkg/webapp                | this is web portal (UI), both client and server.                                                                           |
+| cli                        | this is the goworks cli, can be use to start the UI or run tests directly                                                    |
 
