@@ -1,5 +1,5 @@
 {
-  "name": "webapp",
+  "name": "@pkg/webapp",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",

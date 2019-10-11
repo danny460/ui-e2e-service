@@ -1,5 +1,5 @@
 {
-	"name": "mocha-actor-reporter",
+	"name": "@pkg/mocha-actor-reporter",
 	"version": "1.0.0",
 	"license": "MIT",
 	"engines": {
@@ -19,7 +19,6 @@
 		"meow": "^5.0.0",
 		"prop-types": "^15.7.2",
 		"react": "^16.10.1",
-		"selenium-actor": "file:../selenium-actor",
 		"shortid": "^2.2.15",
 		"uuid": "^3.3.3"
 	},

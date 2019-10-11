@@ -4,14 +4,26 @@
   "private": true,
   "description": "E2E Automation Service With Web Portal",
   "scripts": {
-    "test": "node packages/mocha-scripts/cli.js --reporter packages/mocha-actor-reporter/dist --require packages/mocha-actor-interface --ui mocha-actor  ../../ui-e2e-lib/automation/specs/ui.spec.js",
+    "goworks:server": "cli/bin/goworks server",
+    "goworks:run": "cli/bin/goworks run",
+    "build": "yarn run-all build",
+    "run-all": "node scripts/run-all",
+    "link-packages": "node scripts/link-packages",
+    "preinstall": "npx shx rm -rf node_modules/@pkg",
+    "postinstall": "yarn link-packages && yarn run-all install && yarn build",
     "deps": "cd packages && ls -d */ | xargs -I {} bash -c \"cd '{}' && pwd && yarn install\""
   },
   "devDependencies": {
-    "eslint": "^6.3.0"
+    "bluebird": "^3.7.0",
+    "debug": "^4.1.1",
+    "eslint": "^6.3.0",
+    "fs-extra": "^8.1.0",
+    "glob": "^7.1.4",
+    "npx": "^10.2.0",
+    "shx": "^0.3.2"
   },
-  "repository": {
-    "type": "git",
-    "url": ""
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "mocha": "file:./external/mocha"
   }
 }

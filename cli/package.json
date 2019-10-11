@@ -1,0 +1,22 @@
+{
+  "name": "mocha-scripts",
+  "version": "1.0.0",
+  "description": "cli for testing framework, can be used to start interactive UI or run test suites from command line",
+  "main": "cli.js",
+  "bin": {
+    "goworks": "./bin/cli"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^2.4.2",
+    "debug": "^4.1.1",
+    "yargs": "^14.2.0"
+  },
+  "devDependencies": {
+    "@types/yargs": "^13.0.3"
+  }
+}

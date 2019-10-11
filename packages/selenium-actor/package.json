@@ -1,5 +1,5 @@
 {
-  "name": "selenium-actor",
+  "name": "@pkg/selenium-actor",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
