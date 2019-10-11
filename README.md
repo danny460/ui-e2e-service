@@ -55,11 +55,11 @@ cli/bin/goworks run --file your/test/file.js
 
 The code is orgainized into subpackages in `cli/` and under the `packages/` folder, here are the list of subpackages:
 
-| name                       | responsibility                                                                                                               |
-| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Package Name               | Purpose                                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | @pkg/mocha-actor-interface | this is the extension on mocha to support the custom scripting style (e.g. `I.click(...)`, `I.fill(...)`)                  |
 | @pkg/mocha-actor-reporter  | this is the custom reporter that records progress and results for each test run, the webapp interacts with the reporter to |
 | @pkg/selenium-actor        | this is the wrapper over selenium, the command list are defined here.                                                      |
 | @pkg/webapp                | this is web portal (UI), both client and server.                                                                           |
-| cli                        | this is the goworks cli, can be use to start the UI or run tests directly                                                    |
+| cli                        | this is the goworks cli, can be use to start the UI or run tests directly                                                  |
 
