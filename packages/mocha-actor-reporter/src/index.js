@@ -7,7 +7,7 @@ import React from 'react'
 import shortid from 'shortid';
 
 import Report from './report'
-import { Events as ActorEvents } from 'selenium-actor';
+import { Events as ActorEvents } from '@pkg/selenium-actor';
 
 const {
     EVENT_RUN_BEGIN,

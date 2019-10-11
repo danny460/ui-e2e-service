@@ -1,36 +1,3 @@
-/*
-
-const debug = require('debug')('mocha-scripts:run');
-const mochaRunCommand = require('mocha/lib/cli/run');
-const Mocha = require('mocha');
-const { runMocha } = require('mocha/lib/cli/run-helpers');
-
-const defaults = {
-    require: 'mocha-actor-interface',
-    ui: 'mocha-ator',
-    reporter: 'mocha-actor-reporter',
-}
-
-exports.command = ['run'];
-exports.describe = 'moch run command';
-
-exports.builder = yargs => { 
-    yargs = mochaRunCommand.builder.call(null, yargs);
-    yargs.options({
-        'require': { default: defaults.require },
-        'ui': { default: defaults.ui },
-        'reporter': { default: defaults.reporter }
-    })
-};
-exports.handler = argv => {
-    debug('post-yargs config', argv);
-    const mocha = new Mocha(argv);
-    runMocha(mocha, argv);
-};
-
-*/
-const interface = require('mocha-actor-interface');
-
 const Mocha = require('mocha');
 const {
   createUnsupportedError,
@@ -62,12 +29,16 @@ const GROUPS = {
   CONFIG: 'Configuration'
 };
 
-exports.command = ['run [spec..]', 'inspect'];
+exports.command = ['run [tests..]'];
 
-exports.describe = 'Run tests with Mocha';
+exports.describe = 'use to run test with mocha, check mocha-cli for more info';
 
+/**
+ * @param {import('yargs').Argv} yargs
+ */
 exports.builder = yargs =>
   yargs
+    .version(false)
     .options({
       'allow-uncaught': {
         description: 'Allow uncaught errors to propagate',
@@ -309,10 +280,10 @@ exports.builder = yargs =>
           See https://git.io/vdcSr for migration information.`
         );
       }
-      console.log(argv.require);
-      argv.require = ['mocha-actor-interface'];
+
+      argv.require = ['@pkg/mocha-actor-interface'];
       argv.ui = 'mocha-actor';
-      argv.reporter = 'mocha-actor-reporter';
+      argv.reporter = '@pkg/mocha-actor-reporter';
 
       // load requires first, because it can impact "plugin" validation
       handleRequires(argv.require);
@@ -325,6 +296,8 @@ exports.builder = yargs =>
     .boolean(types.boolean)
     .string(types.string)
     .number(types.number)
+    .help(true)
+    .showHelpOnFail(true)
     .alias(aliases);
 
 exports.handler = argv => {

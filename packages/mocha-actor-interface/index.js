@@ -4,7 +4,7 @@ const Test = require('mocha/lib/test');
 const Context = require('mocha/lib/context');
 const { EVENT_FILE_PRE_REQUIRE } = Suite.constants;
 
-const Actor = require('selenium-actor');
+const Actor = require('@pkg/selenium-actor');
 
 /**
  * @param {import('mocha/lib/suite')} suite the root suite

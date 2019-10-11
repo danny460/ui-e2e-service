@@ -2,17 +2,13 @@
 
 /**
  * framework
- * |____ bin
+ * |____ cli
  * |____ packages
- *       |____ mocha-x
- *       |____ mocha-scripts
- *       |____ mocha-interface
- *       |____ actor-lib
- *       |____ reporter
- *       |____ web
- * 
- * 
- * 
+ *       |____ @pkg/mocha-x
+ *       |____ @pkg/mocha-interface
+ *       |____ @pkg/actor-lib
+ *       |____ @pkg/reporter
+ *       |____ @pkg/web
  * 
  */
 const debug = require('debug')('mocha-scripts:cli');
@@ -21,13 +17,15 @@ const Mocha = require('mocha');
 
 const commands = require('./commands');
 
-exports.main = (argv = process.argv.slice(2)) => {
+exports.main = () => {
+    const argv = process.argv.slice(2);
     yargs
-        .scriptName('xyz')
-        .usage('$0 <cmd> [args]')
+        .scriptName('goworks')
+        // .usage('$0 <cmd> [args]')
+        .showHelpOnFail()
         .command(commands.server)
         .command(commands.run)
-        .help()
+        .demandCommand()
         .argv
 }
 

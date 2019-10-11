@@ -15,7 +15,7 @@ var _shortid = _interopRequireDefault(require("shortid"));
 
 var _report = _interopRequireDefault(require("./report"));
 
-var _seleniumActor = require("selenium-actor");
+var _seleniumActor = require("@pkg/selenium-actor");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
