@@ -12,7 +12,7 @@ const {
   runMocha
 } = require('mocha/lib/cli/run-helpers');
 const {ONE_AND_DONES, ONE_AND_DONE_ARGS} = require('mocha/lib/cli/one-and-dones');
-const debug = require('debug')('mocha:cli:run');
+const debug = require('debug')('goworks:cli:run');
 const defaults = require('mocha/lib/mocharc.json');
 const {types, aliases} = require('mocha/lib/cli/run-option-metadata');
 
@@ -29,7 +29,7 @@ const GROUPS = {
   CONFIG: 'Configuration'
 };
 
-exports.command = ['run [tests..]'];
+exports.command = ['run [tests]'];
 
 exports.describe = 'use to run test with mocha, check mocha-cli for more info';
 

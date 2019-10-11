@@ -6,8 +6,11 @@ import Mocha from 'mocha'
 import React from 'react'
 import shortid from 'shortid';
 
-import Report from './report'
+import Report from './report';
 import { Events as ActorEvents } from '@pkg/selenium-actor';
+import debugLib from 'debug';
+
+const debug = debugLib('@pkg:reporter:reporter');
 
 const {
     EVENT_RUN_BEGIN,
@@ -155,6 +158,6 @@ function dispatchEvent(data) {
     if(isForkProcess) { 
         process.send(data);
     } else {
-        console.error('is not fork process, no IPC data channel');
+        debug('is not fork process, no IPC data channel');
     }
 }

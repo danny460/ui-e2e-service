@@ -6,6 +6,7 @@
   "scripts": {
     "goworks:server": "cli/bin/goworks server",
     "goworks:run": "cli/bin/goworks run",
+    "examples": "yarn goworks:run --file examples/*.spec.js",
     "build": "yarn run-all build",
     "run-all": "node scripts/run-all",
     "link-packages": "node scripts/link-packages",
