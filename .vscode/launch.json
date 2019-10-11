@@ -5,13 +5,15 @@
     "version": "0.2.0",
     "configurations": [
 
+
         {
             "type": "node",
             "request": "launch",
-            "name": "cli",
+            "name": "goworks",
             "args": [
-                "${workspaceFolder}/packages/mocha-scripts/cli.js",
-                "run"
+                "${workspaceFolder}/cli/bin/goworks",
+                "run",
+                "./examples/github.spec.js"
             ],
             "console": "integratedTerminal",
         },
