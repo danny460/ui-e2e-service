@@ -1,8 +1,7 @@
 {
-  "name": "codeworks-automation-framework",
+  "name": "goworks",
   "version": "0.1.0",
-  "private": true,
-  "description": "E2E Automation Service With Web Portal",
+  "description": "goworks E2E Automation Service With Web Portal",
   "scripts": {
     "goworks:server": "cli/bin/goworks server",
     "goworks:run": "cli/bin/goworks run",

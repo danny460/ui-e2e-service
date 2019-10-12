@@ -1,5 +1,5 @@
 {
-  "name": "mocha-scripts",
+  "name": "goworks-cli",
   "version": "1.0.0",
   "description": "cli for testing framework, can be used to start interactive UI or run test suites from command line",
   "main": "cli.js",
