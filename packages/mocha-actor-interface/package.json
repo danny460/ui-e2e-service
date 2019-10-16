@@ -2,5 +2,8 @@
   "name": "@pkg/mocha-actor-interface",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "shortid": "^2.2.15"
+  }
 }

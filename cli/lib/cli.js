@@ -1,16 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * framework
- * |____ cli
- * |____ packages
- *       |____ @pkg/mocha-x
- *       |____ @pkg/mocha-interface
- *       |____ @pkg/actor-lib
- *       |____ @pkg/reporter
- *       |____ @pkg/web
- * 
- */
 const debug = require('debug')('mocha-scripts:cli');
 const yargs = require('yargs');
 const Mocha = require('mocha');

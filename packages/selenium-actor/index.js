@@ -1,7 +1,15 @@
-const { EventEmitter } = require('events')
+const { EventEmitter } = require('events');
 const { Builder } = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 const Context = require('mocha/lib/context');
 const Runner = require('mocha/lib/runner');
+const path =require('path');
+const fse = require('fs-extra');
+const bluebird = require('bluebird');
+
+const fs = bluebird.promisifyAll(fse);
+
+const debug = require('debug')('@pkg:actor');
 
 const {
     FindAllCommand,
@@ -87,9 +95,9 @@ class MochaContextAware extends EventEmitter {
 class Actor extends MochaContextAware {
     constructor(options = {}) {
         super(options);
-    
-        this._driver = options.driver || new Builder().forBrowser('chrome').build();
-        // this.reporter = new Reporter({ driver: this._driver, mochaContext: this.mochaContext });
+        
+        /** @type {import('selenium-webdriver').WebDriver} */
+        this._driver = options.driver || new Builder().forBrowser('chrome').setChromeOptions(new chrome.Options().headless()).build();
     }
 
     /**
@@ -105,15 +113,6 @@ class Actor extends MochaContextAware {
             return driver.quit();
         }
     }
-
-    // /**
-    //  * set mocha test context for actor and reporter
-    //  * @param {Context} mochaContext
-    //  */
-    // setMochaContext(mochaContext) {
-    //     super.setMochaContext(mochaContext);
-    //     this.reporter && this.reporter.setMochaContext(mochaContext);
-    // }
 
     async findAll() {
         await this._executCommand(new FindAllCommand(...arguments));
@@ -158,11 +157,14 @@ class Actor extends MochaContextAware {
         let result, error;
         try {
             this._startCommand(command);
+            this.emitRunnerEvent(Actor.Events.BEFORE_COMMAND_EXECUTE, command);
             result = await command.execute(this._driver);
         } catch (e) {
             error = e;
         } finally {
             this._endCommand(command);
+
+            await this._takeScreenshot(command);
 
             if (error) {
                 command.state = 'failed';
@@ -172,12 +174,13 @@ class Actor extends MochaContextAware {
                 command.state = 'success';
                 this.emitRunnerEvent(Actor.Events.AFTER_COMMAND_SUCCESS, command, result);
             }
+
+            this.emitRunnerEvent(Actor.Events.AFTER_COMMAND_END, command);
         }
     }
 
     _startCommand(command) {
         this._addCommandToContext(command);
-        this.emitRunnerEvent(Actor.Events.BEFORE_COMMAND_EXECUTE, command);
         command.started = true;
         command.startTime = Date.now();
     }
@@ -189,12 +192,31 @@ class Actor extends MochaContextAware {
         }
     }
 
+    async _takeScreenshot(command) {
+        const rootPath = path.resolve(__dirname, '..', '..', '.goworks', 'reports');
+        
+        await fs.ensureDir(rootPath);
+        
+        const filePath = path.resolve(rootPath, `${command.id}.png`);
+        const buffer = await this._driver.takeScreenshot();
+
+        debug('writing to', filePath);
+        try {
+            await fs.writeFile(filePath, buffer, 'base64');
+        } finally {
+            command.afterScreenshot = filePath;
+        }
+    }
+
     _addCommandToContext(command) {
         const test = this._mochaContext && this._mochaContext.test;
         if(test) {
+            command.parent = test;
+            
             if(!Array.isArray(test.commands)) {
                 test.commands = [];
             }
+
             test.commands.push(command);
         }
     }
@@ -204,6 +226,7 @@ Actor.Events = {
     BEFORE_COMMAND_EXECUTE: 'BEFORE_COMMAND_EXECUTE',
     AFTER_COMMAND_SUCCESS: 'AFTER_COMMAND_SUCCESS',
     AFTER_COMMAND_ERROR: 'AFTER_COMMAND_ERROR',
+    AFTER_COMMAND_END: 'AFTER_COMMAND_END',
 }
 
 module.exports = Actor

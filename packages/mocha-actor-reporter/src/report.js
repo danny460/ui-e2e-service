@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Box, Text, Color } from 'ink';
+import { Box, Text, Static, Color } from 'ink';
 import NestedList from './nested-list';
 
 function renderCommand(command, key) {
@@ -68,7 +68,9 @@ class Report extends React.PureComponent {
     render() {
         return (
             <Box flexDirection="column">
-                <Text>{ this.props.title }</Text>
+                <Static>
+                    { this.props.title }
+                </Static>
                 <NestedList 
                     items={this.props.suites}
                     indent={2}

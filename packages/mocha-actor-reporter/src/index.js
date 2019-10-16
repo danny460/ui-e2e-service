@@ -5,10 +5,12 @@ import { render } from 'ink'
 import Mocha from 'mocha'
 import React from 'react'
 import shortid from 'shortid';
+import debugLib from 'debug';
+
+import { FlatReport } from '@pkg/common-utils';
+import { Events as ActorEvents } from '@pkg/selenium-actor';
 
 import Report from './report';
-import { Events as ActorEvents } from '@pkg/selenium-actor';
-import debugLib from 'debug';
 
 const debug = debugLib('@pkg:reporter:reporter');
 
@@ -32,12 +34,37 @@ const ALL_EVENTS = Object.freeze([
     ActorEvents.BEFORE_COMMAND_EXECUTE,
     ActorEvents.AFTER_COMMAND_SUCCESS,
     ActorEvents.AFTER_COMMAND_ERROR,
+    ActorEvents.AFTER_COMMAND_END,
     EVENT_TEST_PENDING,
     EVENT_TEST_PASS,
     EVENT_TEST_FAIL,
     EVENT_TEST_END,
     EVENT_RUN_END,
 ]);
+
+/**
+ * send an update event to parent process 
+ * @typedef {"run"|"suite"|"test"|"command"} UpdateType
+ * @param {UpdateType} type the type of update event, either of run/suite/test/command
+ * @param {object} data the update data
+ * @param {string} [data.id] the id of the entity to be udpated
+ */
+function dispatchUpdate(type, data) {
+    const message = { 
+        type: 'update', 
+        payload: { type, ...data }
+    }
+    dispatch(message);
+}
+
+function dispatch(message) {
+    const isForkProcess = typeof process.send !== 'undefined';
+    if(isForkProcess) { 
+        process.send(message);
+    } else {
+        debug('this is not a forked process, dispatch has no effect');
+    }
+}
 
 /**
 * @class
@@ -54,110 +81,137 @@ class MochaActorReporter extends Mocha.reporters.Base {
     */
     constructor(runner, options) {
         super(runner, options);
-        
-        const title = options.reportTitle || 'Generated Report';
-        const suites = [];
 
-        attachDataPopulation(runner, suites);
-        attachConsoleRender(runner, suites, title);
-        attachEventDispatch(runner, suites);
+        this.suites = [];
+        this.title = options.reportTitle || 'Generated Report';
+        this.jsonReport = new FlatReport();
+
+        this.initJsonReportGeneration();
+        this.initConsoleReporter();
+        this.initEventDispatching();
             
         runner.once(EVENT_RUN_END, () => {
             this.epilogue();
         });
     }
-}
 
-MochaActorReporter.description = 'hierarchical & verbose [default] console + screenshot and live webpage view etc..';
+    setRunId(id) {
+        if(!id) throw new Error('expect run id to be valid UUID, but got ' + id);
+        this.runId = id;
+    }
 
-export default MochaActorReporter;
-
-function attachDataPopulation(runner, suites) {
-    runner.on(EVENT_SUITE_BEGIN, suite => {        
-        const isRootSuite = !suite.parent || suite.parent.root;
-
-        if(!isRootSuite) {
-            suite.id = shortid();
+    initJsonReportGeneration() {
+        this.runner.on(EVENT_SUITE_BEGIN, suite => { 
+            debug('json report: suite begin: %o', suite);
+            if(!suite.parent || suite.parent.root) 
+                return; // root suite, do noting
+            
+            // const id = shortid();
+            const parentId = suite.parent.parent ? 'root' : suite.parent.id;
+            // suite.id = id;
             suite.started = true;
-            suites.push(suite);
-        }
-    }).on(EVENT_TEST_BEGIN,  test => {
-        test.id = shortid();
-        test.started = true;
-    }).on(ActorEvents.BEFORE_COMMAND_EXECUTE, command => {
-        command.id = shortid();
-    });
-}
+            
+            this.jsonReport.addEntity('suite', suite.id, parentId, { status: 'running' })
+            this.suites.push(suite);
+        }).on(EVENT_TEST_BEGIN,  test => {
+            debug('json report: test begin');
+            // const id = shortid();
+            const parentId = test.parent ? 'root' : test.parent.id;
+        
+            // test.id = id;
+            test.started = true;
 
-// render on all events
-function attachConsoleRender(runner, suites, title) {
-    ALL_EVENTS.forEach(event => {
-        runner.on(event, () => render(<Report suites={[...suites]} title={title} />));
-    });
-}
+            this.jsonReport.addEntity('test', test.id, parentId, { status: 'running' });
+        }).on(ActorEvents.BEFORE_COMMAND_EXECUTE, command => {
+            debug('json report: command begin');
+            const id = shortid();
+            const parentId = command.parent ? command.parent.id : null;
+            if(!parentId) {
+                throw new Error('no parent specified for command ' + command);
+            }
 
-const Type = {
-    SUITE: 'suite',
-    TEST: 'test',
-    COMMAND: 'command',
-}
+            command.id = shortid();
+            this.jsonReport.addEntity('command', id, parentId, { status: 'running' });
+        });
+    }
 
-/**
- * 
- * @param {import('mocha').Runner} runner 
- */
-function attachEventDispatch(runner, suites) {
-    process.on('message', data => {
-        if(data.type && data.type === 'init') {
-            dispatchEvent({ type: 'init', data: suites });
-        }
-    });
+    initConsoleReporter() {
+        ALL_EVENTS.forEach(event => {
+            this.runner.on(event, () => render(<Report suites={[...this.suites]} title={this.title} />));
+        });
+    }
 
-    // runner.on(EVENT_RUN_BEGIN, () => { 
-    //     dispatch()
-    // });
-    // runner.on(EVENT_RUN_END, () => { 
-    //     dispatch()
-    // });
-    runner.on(EVENT_SUITE_BEGIN, suite => { 
-        dispatchUpdate(Type.SUITE, suite.id, { started: true });
-    });
-    runner.on(ActorEvents.BEFORE_COMMAND_EXECUTE, command => { 
-        dispatchUpdate(Type.COMMAND, command.id, { started: true });
-    });
-    runner.on(ActorEvents.AFTER_COMMAND_SUCCESS, command => { 
-        dispatchUpdate(Type.COMMAND, command.id, { state: 'success' });
-    });
-    runner.on(ActorEvents.AFTER_COMMAND_ERROR, command => { 
-        dispatchUpdate(Type.COMMAND, command.id, { state: 'failed' });
-    });
-    runner.on(EVENT_TEST_PENDING, test => { 
-        dispatchUpdate(Type.TEST, test.id, { state: 'pending' });
-    });
-    runner.on(EVENT_TEST_PASS, test => { 
-        dispatchUpdate(Type.TEST, test.id, { state: 'success' });
-    });
-    runner.on(EVENT_TEST_FAIL, test => { 
-        dispatchUpdate(Type.TEST, test.id, { state: 'failed' });
-    });
-    runner.on(EVENT_TEST_END, test => { 
-        dispatchUpdate(Type.TEST, test.id, { screenshot: '/' });
-    });
-    // runner.on(EVENT_RUN_END, test => { 
-    //     dispatchUpdate(Type.TEST, test.id, { state: 'pending' });
-    // });
-}
+    initEventDispatching() {
+        dispatch({ type: 'init' });
 
-function dispatchUpdate(type, id, state) {
-    const message = { event: 'update', type, id, state }
-    dispatchEvent(message);
-}
+        process.on('message', data => {
+            if(data.type) {
+                switch (data.type) {
+                    case 'init-ack':
+                        debug('recieved init-ack message with payload %s', data.payload);
+                        this.setRunId(data.payload);
+                        this._doInitEventDispatching();
+                        break;
+                    default:
+                        debug('unhandled message type from reporter', data.type);
+                }
+            }
+        });
+    }
 
-function dispatchEvent(data) {
-    const isForkProcess = typeof process.send !== 'undefined';
-    if(isForkProcess) { 
-        process.send(data);
-    } else {
-        debug('is not fork process, no IPC data channel');
+    _doInitEventDispatching() {
+        this.runner
+            .on(EVENT_RUN_BEGIN, () => {
+                dispatchUpdate('run', { status: 'running' })
+            })
+            .on(EVENT_RUN_END, () => {
+                dispatchUpdate('run', { status: 'completed' });
+            })
+            .on(EVENT_SUITE_BEGIN, suite => {
+                suite.id = suite.id || 'root';
+                const parent = suite.id === 'root' ? suite.parent.id : null;
+                const id = suite.id;
+
+                const { title } = suite;
+                
+                dispatchUpdate('suite', { id, parent, title, status: 'running' });
+            })
+            .on(EVENT_SUITE_END, ({ id }) => {
+                id = id || 'root';
+                dispatchUpdate('suite', { id, status: 'completed' });
+            })
+            .on(EVENT_TEST_BEGIN, ({ id, parent, title }) => {
+                parent = parent.id;
+                dispatchUpdate('test', { id, parent, title, status: 'running'});
+            })
+            .on(EVENT_TEST_END, ({ id }) => {
+                // dispatchUpdate('test', { id });
+            })
+            .on(EVENT_TEST_FAIL, ({ id }) => {
+                dispatchUpdate('test', { id, status: 'failed'});
+            })
+            .on(EVENT_TEST_PASS, ({ id }) => {
+                dispatchUpdate('test', { id, status: 'passed'});
+            })
+            .on(EVENT_TEST_PENDING, ({ id }) => {
+                dispatchUpdate('test', { id, status: 'pending'});
+            })
+            .on(ActorEvents.BEFORE_COMMAND_EXECUTE, ({ id, parent, name, args }) => {
+                parent = parent.id;
+                dispatchUpdate('command', { id, parent, name, args, status: 'running'});
+            })
+            .on(ActorEvents.AFTER_COMMAND_SUCCESS, ({ id }) => {
+                dispatchUpdate('command', { id, status: 'passed'});
+            })
+            .on(ActorEvents.AFTER_COMMAND_ERROR, ({ id }) => {
+                dispatchUpdate('command', { id, status: 'failed'});
+            })
+            .on(ActorEvents.AFTER_COMMAND_END, ({ id, afterScreenshot }) => {
+                dispatchUpdate('command', { id, afterScreenshot });
+            });
     }
 }
+
+MochaActorReporter.description = 'hierarchical & verbose console reporter + web UI';
+
+export default MochaActorReporter;

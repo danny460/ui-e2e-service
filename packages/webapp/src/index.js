@@ -1,15 +1,8 @@
+import './index.css';
+
 import React from 'react';
 import { render } from 'react-dom';
 
-import IDE from './ide';
-
-
-class App extends React.Component {
-    render() {
-        return (
-            <IDE />
-        );
-    }
-}
+import App from './components/app';
 
 render(<App/>, document.getElementById('root'));

@@ -4,6 +4,8 @@ const Test = require('mocha/lib/test');
 const Context = require('mocha/lib/context');
 const { EVENT_FILE_PRE_REQUIRE } = Suite.constants;
 
+const shortid = require('shortid');
+
 const Actor = require('@pkg/selenium-actor');
 
 /**
@@ -33,7 +35,9 @@ module.exports = Mocha.interfaces['mocha-actor'] = function(suite) {
          * Fixture
          */
         context.fixture = function(title, fn) {
-            return common.suite.create({ title, file, fn });
+            const suite = common.suite.create({ title, file, fn });
+            suite.id = shortid();
+            return suite;
         }
 
         context.fixture.skip = function(title, fn) {
@@ -55,6 +59,8 @@ module.exports = Mocha.interfaces['mocha-actor'] = function(suite) {
 
             const test = new Test(title, fn);
             test.file = file;
+            test.id = shortid();
+            
             suite.addTest(test);
             return test;
         }

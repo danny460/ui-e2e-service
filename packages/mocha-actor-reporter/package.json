@@ -8,6 +8,7 @@
 	"scripts": {
 		"clean": "rm -rf dist",
 		"prebuild": "yarn clean",
+		"watch": "nodemon --watch src -x \"yarn build\"",
 		"build": "babel src --out-dir dist"
 	},
 	"main": "dist/index",

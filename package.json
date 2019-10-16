@@ -14,16 +14,17 @@
     "deps": "cd packages && ls -d */ | xargs -I {} bash -c \"cd '{}' && pwd && yarn install\""
   },
   "devDependencies": {
-    "bluebird": "^3.7.0",
-    "debug": "^4.1.1",
     "eslint": "^6.3.0",
-    "fs-extra": "^8.1.0",
     "glob": "^7.1.4",
+    "nodemon": "^1.19.4",
     "npx": "^10.2.0",
     "shx": "^0.3.2"
   },
   "dependencies": {
     "chalk": "^2.4.2",
+    "bluebird": "^3.7.0",
+    "debug": "^4.1.1",
+    "fs-extra": "^8.1.0",
     "mocha": "file:./external/mocha"
   }
 }
