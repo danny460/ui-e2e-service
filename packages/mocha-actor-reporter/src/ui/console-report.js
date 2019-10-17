@@ -17,7 +17,7 @@ function renderCommand(command, key) {
                 <Color {...{[displayColor]: true}}>-{name} {args}</Color> {durationText}
             </Box>
         </Box>
-    )
+    );
 }
 
 
@@ -50,21 +50,22 @@ function renderTest(test, key) {
     );
 }
 
-function renderSuite(item, key) {
-    if(item.started) {
-        const spacer = ' ';
+function renderSuite(suite, key) {
+    if(suite && suite.started) {
+        const isRootSuite = suite.root;
+        const spacer = isRootSuite ? null : ' ';
         return (
             <Box key={key} flexDirection="column">
                 { spacer } 
-                <Text>{ item.title }</Text>
-                <NestedList items={item.tests} indent={2} renderItem={renderTest} />
-                <NestedList items={item.suites} indent={2} renderItem={renderSuite} />
+                <Text>{ suite.title }</Text>
+                <NestedList items={suite.tests} indent={2} renderItem={renderTest} />
+                <NestedList items={suite.suites} indent={2} renderItem={renderSuite} />
             </Box>
         );
     }
 }
 
-class Report extends React.PureComponent {
+class ConsoleReport extends React.PureComponent {
     render() {
         return (
             <Box flexDirection="column">
@@ -80,9 +81,9 @@ class Report extends React.PureComponent {
     }
 }
 
-Report.propTypes = {
+ConsoleReport.propTypes = {
     title: PropTypes.string,
     suites: PropTypes.array,
 };
 
-export default Report;
+export default ConsoleReport;

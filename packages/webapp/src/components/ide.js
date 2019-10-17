@@ -1,5 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react'
+import { parse } from 'flatted';
 
 import CodeEditor from './code-editor';
 import Report from './report';
@@ -22,9 +23,9 @@ export default @observer class IDE extends React.Component {
                 subscribeToTestUpdate(testRunId, data => {
                     console.log('@@DEBUG - on update triggered', data);
                     this.setState({
-                        testData: { ...data }
+                        suite: parse(data),
                     }, () => {
-                        console.log('@@DEBUG - test data is updated', this.state.testData);
+                        console.log('@@DEBUG - test data is updated', this.state.suite);
                     })
                 })
             }
@@ -37,7 +38,7 @@ export default @observer class IDE extends React.Component {
                 <button onClick={this.onRunTest.bind(this)}>RUN</button>
                 <CodeEditor />,
             </div>,
-            <Report key='report' testData={this.state.testData}/>,
+            <Report key='report' suite={this.state.suite}/>,
         ];
 
         return (

@@ -82,7 +82,6 @@ class FlatReport {
             throw new Error(`error adding ${type} with id ${id} already exists`);
         const entity = new constructor();
         entities[id] = Object.assign(entity, { id, parent, ...options });
-        console.log('@@@@@@DEBUG ADDED', entities[id]);
     }
 
     updateEntity(type, id, data) {

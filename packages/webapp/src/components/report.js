@@ -4,18 +4,17 @@ import PropTypes from 'prop-types';
 
 export default class Report extends React.Component {
     render() {
-        const { testData } = this.props;
+        const { suite } = this.props;
         
 
         let content = null;
-        if (testData) {
-            const rootSuite = testData.suites.root;
-            // const isNakedTest = rootSuite.suites.length === 0;
+        
+        if (suite) {
+            const rootSuite = suite;
             const isSingleSuite = rootSuite.suites.length <= 1;
 
             if(isSingleSuite) {
-                const suiteId = rootSuite.suites[0];
-                const suite = testData.suites[suiteId];
+                const suite = rootSuite.suites[0];
                 
                 if(suite.suites.length > 1)
                     throw new Error('unhandled nested suite case');
@@ -23,20 +22,18 @@ export default class Report extends React.Component {
                 if(suite.tests.length > 1)
                     throw new Error('unhandled multiple tests case');
     
-                const testId = suite.tests[0];
-                const test = testData.tests[testId];
+                const test = suite.tests[0];
 
                 if(test) {
                     console.info({ test });
                     const gallery = null;
-                    const commandList = test.commands.map(commandId => {
-                        const command = testData.commands[commandId];
-                        
+                
+                    const commandList = (test.commands || []).map(command => {
                         return (
-                            <pre key={commandId}>
+                            <pre key={command.id}>
                                 { 
                                     command.afterScreenshot 
-                                    ? <img src={`/report/${testData.runId}/screenshots/${commandId}`} width='400' height='auto'/>
+                                    ? <img src={`/report/${suite.runId}/screenshots/${command.id}`} width='400' height='auto'/>
                                     : null
                                 }
                                 {command.name} {command.args.join(' ')}
@@ -56,9 +53,6 @@ export default class Report extends React.Component {
             }
         }
 
-
-        
-
         return (
             <div>
                 <h1>This is Report</h1>
@@ -69,5 +63,5 @@ export default class Report extends React.Component {
 }
 
 Report.propTypes = { 
-    testData: PropTypes.any,
+    suite: PropTypes.any,
 }

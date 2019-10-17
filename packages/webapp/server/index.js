@@ -196,6 +196,17 @@ app.post('/run', async (req, res) => {
         processMap[worker.id] = worker;
         reportCache.init(worker.id);
 
+        const cacheUpdateHandler = cacheId => {
+            const testRunId = worker.id;
+            debugSock('report cache update is triggered: ### cacheId: %s ### testRunId: %s', cacheId, testRunId);
+            if(cacheId === testRunId) {
+                debugSock('report cache update matched, sending update via socket');
+                ws.to(testRunId).emit('update', reportCache.get(testRunId));
+            }
+        }
+
+        reportCache.on('update', cacheUpdateHandler);
+
         worker.on('error', data => {
             debug('worker error: %o', data);
             onRunComplete(worker);
@@ -211,31 +222,18 @@ app.post('/run', async (req, res) => {
                     return worker.send({ type: 'init-ack', payload: worker.id });
                 case 'update':
                     debug('recieved update %o', payload);
-                    if(payload.type === 'run') {
-                        const report = reportCache.get(worker.id);
-                        report.status = payload.status;
-                        reportCache.emit('update', worker.id);
-                    } else {
-                        reportCache.update(worker.id, payload);
-                    }
+                    reportCache._cache[worker.id] = payload;
+                    reportCache.emit('update', worker.id);
                     break;
                 default:
-                    // throw new Error('unknow message type: ' + type + ' recieved');
+                    debug('unhandled message: %o', data);
             }
         });
 
         worker.on('exit', () => {
             debug('worker exitted');
+            reportCache.off('update', cacheUpdateHandler);
             onRunComplete(worker);
-        });
-
-        reportCache.on('update', cacheId => {
-            const testRunId = worker.id;
-            debugSock('report cache update is triggered: ### cacheId: %s ### testRunId: %s', cacheId, testRunId);
-            if(cacheId === testRunId) {
-                debugSock('report cache update matched, sending update via socket');
-                ws.to(testRunId).emit('update', reportCache.get(testRunId));
-            }
         });
     }
 
@@ -244,11 +242,10 @@ app.post('/run', async (req, res) => {
 
 function onRunComplete(worker, error) {
     const { id } = worker;
-    const hasError = Boolean(error);
     
     const report = reportCache.get(id);
 
-    if(hasError) {
+    if(error) {
         report.status = 'error';
     } else {
         report.status = 'complete';
