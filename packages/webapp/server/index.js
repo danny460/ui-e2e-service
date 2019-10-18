@@ -109,7 +109,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.get('/report/:runId/screenshots/:id', async (req, res) => {
+app.get('/runs/:runId/screenshots/:id', async (req, res) => {
     const { runId, id } = req.params;
     debug('get image for ###runId: %s ###id: %s', runId, id);
 

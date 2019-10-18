@@ -171,7 +171,7 @@ class Actor extends MochaContextAware {
                 this.emitRunnerEvent(Actor.Events.AFTER_COMMAND_ERROR, command, error);
                 throw new Error(`error executing actor command ${command.name}:${command.args[0]}, ${error}`);
             } else {
-                command.state = 'success';
+                command.state = 'passed';
                 this.emitRunnerEvent(Actor.Events.AFTER_COMMAND_SUCCESS, command, result);
             }
 
