@@ -6,7 +6,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 
-import ImageSlider from './image-slider';
+import ImageSlider from './image-slide';
 import { ListItemIcon, CircularProgress, makeStyles } from '@material-ui/core';
 
 import CheckIcon from '@material-ui/icons/CheckCircle';

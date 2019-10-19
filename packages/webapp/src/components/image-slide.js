@@ -98,6 +98,20 @@ export default function ImageSlide(props) {
         setIndex(index + 1);
     }
 
+    const showControls = imageList.length > 0;
+    const showLeftArrow = index !== 0;
+    const showRightArrow = index !== imageList.length - 1;
+
+    const controls = showControls 
+        ? ( 
+            <>
+                {showLeftArrow && <Arrow size="small" color="primary" aria-label="left" className={`${classes.arrow} ${classes.arrowLeft}`} onClick={prev} /> }
+                {showRightArrow && <Arrow size="small" color="primary" aria-label="right" className={`${classes.arrow} ${classes.arrowRight}`} onClick={next} right /> }
+            </> 
+        )
+        : null; 
+
+
     const content = (!imageList.length && props.showLoading) 
         ? <CircularProgress className={classes.progress} />
         : imageList
@@ -105,8 +119,7 @@ export default function ImageSlide(props) {
     return (
         <div>
             <div className={classes.container}>
-                <Arrow size="small" color="primary" aria-label="left" className={`${classes.arrow} ${classes.arrowLeft}`} onClick={prev} />
-                <Arrow size="small" color="primary" aria-label="right" className={`${classes.arrow} ${classes.arrowRight}`} onClick={next} right />
+                { controls }
                 { content  }
             </div>
         </div>
