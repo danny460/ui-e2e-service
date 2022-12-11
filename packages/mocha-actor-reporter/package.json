@@ -14,7 +14,7 @@
 	"main": "dist/index",
 	"dependencies": {
 		"eslint-plugin-react": "^7.14.3",
-		"express": "^4.17.1",
+		"express": "^4.17.3",
 		"flatted": "^2.0.1",
 		"ink": "^2.4.0",
 		"meow": "^5.0.0",
